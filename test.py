@@ -24,6 +24,6 @@ print checkexist("smalick")
 print checkexist("sachal")
 print checkexist("w")
 print filelist
-print hashed
-print hashlib.sha224("hello")
+print hashed.hexdigest()
+print hashlib.sha224("hello").hexdigest()
 

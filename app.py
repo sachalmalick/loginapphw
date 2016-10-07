@@ -1,6 +1,7 @@
-import random, csv
+import random, csv, hashlib
 from flask import Flask, render_template, request,redirect,url_for,session
 app = Flask(__name__)
+app.secret_key = 'password'
 
 
 @app.route("/jacobo")
@@ -51,8 +52,7 @@ def login(username,password):
         return render_template("login.html",displaymessage = "That username doesnt exist")
     
 @app.route("/sort", methods=['POST'])
-def sort(hey):
-    print hey
+def sort():
     username = request.form["username"]
     password = request.form["password"]
     filelist = readcsv()
@@ -60,9 +60,10 @@ def sort(hey):
         if(checkexist(username)):
             for x in filelist:
                 if(x[0] == username):
-                    if(x[1] == password):
+                    hashedpw = hashlib.sha224(password)
+                    if(x[1] == hashedpw.hexdigest()):
                         session["username"] = username 
-                        return render_template("success.html")
+                        return redirect(url_for('home'))
                     else:
                         return render_template("login.html",displaymessage = "Incorrect password")
                 
@@ -72,7 +73,8 @@ def sort(hey):
         if(checkexist(username)):
             return render_template("login.html",displaymessage = "That username already exists")
         else:
-            writecsv(username,password)
+            hashedpw = hashlib.sha224(password).hexdigest()
+            writecsv(username,hashedpw)
             
             return render_template("login.html",displaymessage = "Account successfully created")
         
@@ -108,22 +110,14 @@ def register(username,password):
         return render_template("login.html",displaymessage = "Account successfully created")
         
 
-@app.route("/welcome")
-def welcome():
-    return session
-    
-@app.route("/home", methods=['POST'])
+@app.route("/home")
 def home():
     if ("username" in session):
-        redirect(url_for('welcome'))
+        return render_template('welcome.html')
     else:
-        redirect(url_for('sort'))
+        return redirect('/')
 
-    
 
-    
-
-    
 
 
 if __name__=="__main__":
