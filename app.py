@@ -1,9 +1,11 @@
 import random, csv
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request,redirect,url_for,session
 app = Flask(__name__)
 
 
-
+@app.route("/jacobo")
+def js():
+    return "url :" + url_for('sort')
 
 @app.route("/")
 def pagetwo():
@@ -49,7 +51,8 @@ def login(username,password):
         return render_template("login.html",displaymessage = "That username doesnt exist")
     
 @app.route("/sort", methods=['POST'])
-def sort():
+def sort(hey):
+    print hey
     username = request.form["username"]
     password = request.form["password"]
     filelist = readcsv()
@@ -58,6 +61,7 @@ def sort():
             for x in filelist:
                 if(x[0] == username):
                     if(x[1] == password):
+                        session["username"] = username 
                         return render_template("success.html")
                     else:
                         return render_template("login.html",displaymessage = "Incorrect password")
@@ -103,6 +107,18 @@ def register(username,password):
         writecsv(username,password)
         return render_template("login.html",displaymessage = "Account successfully created")
         
+
+@app.route("/welcome")
+def welcome():
+    return session
+    
+@app.route("/home", methods=['POST'])
+def home():
+    if ("username" in session):
+        redirect(url_for('welcome'))
+    else:
+        redirect(url_for('sort'))
+
     
 
     
