@@ -17,7 +17,8 @@ def pagetwo():
     print request
     print ":::DIAG::: this request.args object obj"
     #print request.args["username"]
-
+    if('username' in session):
+        session.pop('username')
     return render_template("login.html")
 
 def readcsv():
@@ -51,7 +52,7 @@ def login(username,password):
     else:
         return render_template("login.html",displaymessage = "That username doesnt exist")
     
-@app.route("/sort", methods=['POST'])
+@app.route("/sort", methods=['POST','GET'])
 def sort():
     username = request.form["username"]
     password = request.form["password"]
